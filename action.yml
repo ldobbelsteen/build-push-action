@@ -1,25 +1,25 @@
 name: Build and Push Container Image
-description: "Builds a container image using Buildah and pushes it to a specified container registry."
+description: Builds a container image using Buildah and pushes it to a specified container registry.
 
 inputs:
-  image_name:
-    description: "Name of the image to build"
+  image:
+    description: Name of the image to build
     required: true
-  registry_name:
-    description: "Container registry to push to"
+  owner:
+    description: Owner of the repository where the image will be pushed
     required: true
-  registry_username:
-    description: "Username for the container registry"
+  actor:
+    description: GitHub actor (username) for authentication
     required: true
-  registry_password:
-    description: "Password for the container registry"
+  token:
+    description: GitHub token with permissions to push to the registry
     required: true
   push:
-    description: "Whether to push the image to the registry (true/false)"
+    description: Whether to push the image to the registry (true/false)
     required: true
 
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -28,7 +28,7 @@ runs:
       id: image-build
       uses: redhat-actions/buildah-build@v2
       with:
-        image: ${{ inputs.image_name }}
+        image: ${{ inputs.image }}
         tags: latest
         containerfiles: |
           ./Containerfile
@@ -36,21 +36,23 @@ runs:
     - name: Log in to registry
       uses: redhat-actions/podman-login@v1
       with:
-        registry: ${{ inputs.registry_name }}
-        username: ${{ inputs.registry_username }}
-        password: ${{ inputs.registry_password }}
+        registry: ghcr.io/${{ inputs.owner }}
+        username: ${{ inputs.actor }}
+        password: ${{ inputs.token }}
 
     - name: Push image to registry
       if: ${{ inputs.push == 'true' }}
       uses: redhat-actions/push-to-registry@v2
       with:
-        registry: ${{ inputs.registry }}
+        registry: ghcr.io/${{ inputs.owner}}
         image: ${{ steps.image-build.outputs.image }}
         tags: ${{ steps.image-build.outputs.tags }}
 
     - name: Remove untagged images
       uses: actions/delete-package-versions@v5
       with:
+        owner: ${{ inputs.owner }}
+        token: ${{ inputs.token }}
         package-type: container
-        package-name: ${{ inputs.image_name }}
+        package-name: ${{ inputs.image }}
         delete-only-untagged-versions: true
