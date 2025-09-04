@@ -1,12 +1,21 @@
 name: Build and Push Container Image
-description: "Builds a container from a Containerfile and pushes it to a registry if its the main branch."
+description: "Builds a container image using Buildah and pushes it to a specified container registry."
 
 inputs:
   image_name:
     description: "Name of the image to build"
     required: true
-  registry:
+  registry_name:
     description: "Container registry to push to"
+    required: true
+  registry_username:
+    description: "Username for the container registry"
+    required: true
+  registry_password:
+    description: "Password for the container registry"
+    required: true
+  push:
+    description: "Whether to push the image to the registry (true/false)"
     required: true
 
 runs:
@@ -27,12 +36,12 @@ runs:
     - name: Log in to registry
       uses: redhat-actions/podman-login@v1
       with:
-        registry: ${{ inputs.registry }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: ${{ inputs.registry_name }}
+        username: ${{ inputs.registry_username }}
+        password: ${{ inputs.registry_password }}
 
     - name: Push image to registry
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ inputs.push == 'true' }}
       uses: redhat-actions/push-to-registry@v2
       with:
         registry: ${{ inputs.registry }}
