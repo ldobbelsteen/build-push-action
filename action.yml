@@ -1,0 +1,47 @@
+name: Build and Push Container Image
+description: "Builds a container from a Containerfile and pushes it to a registry if its the main branch."
+
+inputs:
+  image_name:
+    description: "Name of the image to build"
+    required: true
+  registry:
+    description: "Container registry to push to"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build container image
+      id: image-build
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: ${{ inputs.image_name }}
+        tags: latest
+        containerfiles: |
+          ./Containerfile
+
+    - name: Log in to registry
+      uses: redhat-actions/podman-login@v1
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Push image to registry
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        registry: ${{ inputs.registry }}
+        image: ${{ steps.image-build.outputs.image }}
+        tags: ${{ steps.image-build.outputs.tags }}
+
+    - name: Remove untagged images
+      uses: actions/delete-package-versions@v5
+      with:
+        package-type: container
+        package-name: ${{ inputs.image_name }}
+        delete-only-untagged-versions: true
