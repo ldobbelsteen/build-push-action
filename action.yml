@@ -1,5 +1,5 @@
 name: Build and Push Container Image
-description: Builds a container image using Buildah and pushes it to a specified container registry.
+description: Builds a container image using Buildah and pushes it to GitHub Container Registry (GHCR).
 
 inputs:
   image:
