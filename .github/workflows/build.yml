@@ -10,10 +10,11 @@ jobs:
       contents: read
       packages: write
     env:
-      IS_DEFAULT_BRANCH: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+      PUSH: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Build image
         id: build
@@ -31,7 +32,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push image
-        if: env.IS_DEFAULT_BRANCH == 'true'
+        if: env.PUSH == 'true'
         uses: redhat-actions/push-to-registry@v2
         with:
           registry: ghcr.io
@@ -39,7 +40,7 @@ jobs:
           tags: ${{ steps.build.outputs.tags }}
 
       - name: Clean up images
-        if: env.IS_DEFAULT_BRANCH == 'true'
+        if: env.PUSH == 'true'
         uses: actions/delete-package-versions@v5
         with:
           owner: ${{ github.repository_owner }}
