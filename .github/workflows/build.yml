@@ -22,7 +22,7 @@ jobs:
         with:
           image: ${{ github.event.repository.name }}
           tags: latest
-          containerfiles: ./Containerfile
+          containerfiles: ./Dockerfile
 
       - name: Log in to GHCR
         uses: redhat-actions/podman-login@v1
