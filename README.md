@@ -2,7 +2,7 @@
 
 Reusable GitHub Actions workflow to **build a container image** using [Buildah](https://github.com/containers/buildah) and **push it to GitHub Container Registry (GHCR)**.  
 
-- Builds your image from `./Containerfile`
+- Builds your image from `./Dockerfile`
 - Tags it as `:latest`
 - Pushes only when running on the **default branch**
 - Cleans up untagged images from GHCR automatically
