@@ -20,7 +20,7 @@ on: push
 
 jobs:
   build:
-    uses: ldobbelsteen/ghcr-build-push/.github/workflows/build.yml@multiarch
+    uses: ldobbelsteen/ghcr-build-push/.github/workflows/build.yml@main
     permissions:
       contents: read
       packages: write
