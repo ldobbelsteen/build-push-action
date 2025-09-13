@@ -1,11 +1,12 @@
 # ghcr-build-push
 
-Reusable GitHub Actions workflow to **build a container image** using [Buildah](https://github.com/containers/buildah) and **push it to GitHub Container Registry (GHCR)**.  
+Reusable GitHub Actions workflow to **build a container image** and **push it to GitHub Container Registry (GHCR)**.  
 
-- Builds your image from `./Dockerfile`
-- Tags it as `:latest`
+- Builds images from `./Dockerfile` for both `amd64` and `arm64`
+- Tags them as `:latest-amd64` and `:latest-arm64` respectively
+- Combines them into a multi-arch tag `:latest`
 - Pushes only when running on the **default branch**
-- Cleans up untagged images from GHCR automatically
+- Cleans up any untagged images from GHCR automatically
 
 ---
 
@@ -19,4 +20,7 @@ on: push
 
 jobs:
   build:
-    uses: ldobbelsteen/ghcr-build-push/.github/workflows/build.yml@main
+    uses: ldobbelsteen/ghcr-build-push/.github/workflows/build.yml@multiarch
+    permissions:
+      contents: read
+      packages: write
