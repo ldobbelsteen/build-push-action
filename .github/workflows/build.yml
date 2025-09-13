@@ -41,7 +41,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           tags: ${{ env.IMAGE }}:latest-${{ matrix.platform }}
-          push: ${{ env.PUSH }}
+          push: ${{ env.PUSH == 'true' }}
 
   combine-builds:
     needs: build-by-platform
@@ -59,7 +59,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create and push multi-arch manifest
-        if: ${{ env.PUSH }}
+        if: ${{ env.PUSH == 'true' }}
         run: |
           docker manifest create ${{ env.IMAGE }}:latest \
             ${{ env.IMAGE }}:latest-amd64 \
