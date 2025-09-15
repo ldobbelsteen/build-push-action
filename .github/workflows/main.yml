@@ -34,10 +34,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - platform: linux/amd64
+          - arch: amd64
             runner: ubuntu-24.04
-          - platform: linux/arm64
+            platform: linux/amd64
+          - arch: arm64
             runner: ubuntu-24.04-arm
+            platform: linux/arm64
     runs-on: ${{ matrix.runner }}
 
     permissions:
@@ -72,7 +74,7 @@ jobs:
       - name: Export image digest ref
         run: |
           mkdir -p digests
-          echo "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}" > "digests/${{ matrix.platform }}.txt"
+          echo "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}" > "digests/${{ matrix.arch }}.txt"
 
       - name: Upload digests artifact
         uses: actions/upload-artifact@v4
