@@ -11,5 +11,5 @@ permissions:
 
 jobs:
   build:
-    uses: ldobbelsteen/ghcr-build-push/.github/workflows/build.yml@v1
+    uses: ldobbelsteen/ghcr-build-push/.github/workflows/main.yml@v1
 ```
