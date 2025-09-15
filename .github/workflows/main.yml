@@ -71,6 +71,8 @@ jobs:
           outputs: type=registry,push-by-digest=true,name=${{ env.IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
+          sbom: false
 
       - name: Export image digest ref
         run: |
