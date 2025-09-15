@@ -124,21 +124,3 @@ jobs:
 
           REFS=$(paste -sd " " digests/*.txt)
           docker buildx imagetools create $TAG_ARGS $REFS
-
-  cleanup:
-    needs: merge
-
-    runs-on: ubuntu-24.04
-
-    permissions:
-      packages: write
-
-    steps:
-      - name: Clean up untagged images
-        uses: actions/delete-package-versions@v5
-        with:
-          package-type: container
-          token: ${{ secrets.GITHUB_TOKEN }}
-          owner: ${{ github.repository_owner }}
-          package-name: ${{ github.event.repository.name }}
-          delete-only-untagged-versions: true
