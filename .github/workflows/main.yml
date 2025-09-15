@@ -7,7 +7,7 @@ env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
-  meta:
+  metadata:
     runs-on: ubuntu-24.04
 
     permissions:
@@ -29,7 +29,7 @@ jobs:
             type=ref,event=branch
 
   build:
-    needs: meta
+    needs: metadata
 
     strategy:
       matrix:
@@ -40,6 +40,7 @@ jobs:
           - arch: arm64
             runner: ubuntu-24.04-arm
             platform: linux/arm64
+    
     runs-on: ${{ matrix.runner }}
 
     permissions:
@@ -66,24 +67,23 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          labels: ${{ needs.meta.outputs.labels }}
+          labels: ${{ needs.metadata.outputs.labels }}
           outputs: type=registry,push-by-digest=true,name=${{ env.IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Export image digest ref
         run: |
-          mkdir -p digests
-          echo "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}" > "digests/${{ matrix.arch }}.txt"
+          echo "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}" > "digest-${{ matrix.arch }}.txt"
 
       - name: Upload digests artifact
         uses: actions/upload-artifact@v4
         with:
-          name: digests
-          path: digests/*.txt
+          name: digest-${{ matrix.arch }}
+          path: digest-${{ matrix.arch }}.txt
 
   merge:
-    needs: [meta, build]
+    needs: [metadata, build]
 
     runs-on: ubuntu-24.04
 
@@ -95,7 +95,8 @@ jobs:
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
-          name: digests
+          pattern: digest-*
+          merge-multiple: true
           path: digests
 
       - name: Set up Docker Buildx (for imagetools)
@@ -110,7 +111,7 @@ jobs:
 
       - name: Create and push multi-arch manifest
         env:
-          TAGS: ${{ needs.meta.outputs.tags }}
+          TAGS: ${{ needs.metadata.outputs.tags }}
         run: |
           TAG_ARGS=""
           # metadata-action outputs tags as newline-separated values
