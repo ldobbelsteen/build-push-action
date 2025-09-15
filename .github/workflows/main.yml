@@ -5,13 +5,10 @@ on:
 
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
-  DEFAULT_RUNNER: ubuntu-24.04
-  AMD64_RUNNER: ubuntu-24.04
-  ARM64_RUNNER: ubuntu-24.04-arm
 
 jobs:
   meta:
-    runs-on: $DEFAULT_RUNNER
+    runs-on: ubuntu-24.04
 
     permissions:
       contents: read
@@ -38,9 +35,9 @@ jobs:
       matrix:
         include:
           - platform: linux/amd64
-            runner: $AMD64_RUNNER
+            runner: ubuntu-24.04
           - platform: linux/arm64
-            runner: $ARM64_RUNNER
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
 
     permissions:
@@ -86,7 +83,7 @@ jobs:
   merge:
     needs: [meta, build]
 
-    runs-on: $DEFAULT_RUNNER
+    runs-on: ubuntu-24.04
 
     permissions:
       contents: read
@@ -126,7 +123,7 @@ jobs:
   cleanup:
     needs: merge
 
-    runs-on: $DEFAULT_RUNNER
+    runs-on: ubuntu-24.04
 
     permissions:
       packages: write
