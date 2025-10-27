@@ -79,7 +79,7 @@ jobs:
           echo "${{ env.IMAGE }}@${{ steps.build.outputs.digest }}" > "digest-${{ matrix.arch }}.txt"
 
       - name: Upload digests artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: digest-${{ matrix.arch }}
           path: digest-${{ matrix.arch }}.txt
